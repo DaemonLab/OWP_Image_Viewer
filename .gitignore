@@ -1,0 +1,10 @@
+# directories
+bin/*
+obj/*
+
+# temp files
+*~
+
+# codeblocks files
+*.depend
+*.layout
