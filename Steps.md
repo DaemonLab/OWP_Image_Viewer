@@ -10,5 +10,9 @@ We will create 4 buttons and a box in this tutorial. The box will be used to dis
 Also, there was one error in comments of the previous commit, it was mentioned that the starting 4 paramters to constructor of Box are coordinates of top left corner and bottom right corner of the box. But the first two parameters are coordinates of top left corner and the later two parameters are width and height of the box respectively. Sorry for the error.  
 In this step, we see how intuitive and functions based model FLTK is. This simplicity comes with a slight price that the GUI from FLTK is not so nice looking. But for beginning GUI programming simplicity should be given more importance. Once you have mastered FLTK, learning other more complicated GUI libraries will become quite easier (either on your own or from upcoming OWPs).  
 
-### Step 3
+### Step 3 -- Opening and image from file dialog box
+In this step, we create utilities.h and utilities.cpp files and add a function which loads an image from file path. The code is self explanatory with some comments. We also make our image box global and change the image on it in the `open_cb` callback. The code has been explained in comments. We need to redraw the image box after changing the image as, like all GUI APIs, fltk avoids redrawing everything to reduce unnecessary overload. In the next step we will add a list to our program and let the user view all the files from a certain directory rather than just a single image.  
+This step is small, you can use fltk documentation to view all the FLTK classes and functions and how to use them.  
+
+### Step 4
 Coming Soon...

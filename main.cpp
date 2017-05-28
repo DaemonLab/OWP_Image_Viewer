@@ -4,8 +4,11 @@
 #include <FL/Fl_Button.H>   // For Buttons
 #include <FL/Fl_Menu_Bar.H> // For Menu Bar
 #include <FL/Fl_Menu_Item.H> // Menu items
+#include <FL/Fl_File_Chooser.H> // For open file dialog box
 
 #include <FL/fl_ask.H>
+
+#include "utilities.h"  // Our own utility toolkit
 
 // Function declarations
 void create_all_widgets();
@@ -13,6 +16,9 @@ void create_menu_bar();
 void open_cb(Fl_Widget*, void*);    // Called for open menu
 void quit_cb(Fl_Widget*, void*);    // Called for quit menu
 void about_cb(Fl_Widget*, void*);    // Called for about menu
+
+// Global variable
+Fl_Box *image_box;          // Just a box to display the required images
 
 int main (int argc, char ** argv)
 {
@@ -30,11 +36,10 @@ int main (int argc, char ** argv)
 
 void create_all_widgets()
 {
-    Fl_Box *box;          // Just a box to display the required images
     // Create a box which will be used to display the image. First first two numbers are
     // coordinates of the top left corner of the box. The later two numbers are width and height of the box
-    box = new Fl_Box (20, 40, 360, 340, "Image goes here");
-    box->box (FL_UP_BOX);     // The box should have a 3D feel that it's UP
+    image_box = new Fl_Box (20, 40, 360, 340, "Image goes here");
+    image_box->box (FL_UP_BOX);     // The box should have a 3D feel that it's UP
 
     // Create some buttons, first two numbers are coordinates of the top left
     // corner of the button. The later two numbers are width and height of the button
@@ -82,7 +87,29 @@ void create_menu_bar()
 
 void open_cb(Fl_Widget*, void*)
 {
-    // Open a new image
+    // Open a new image using the standard file chooser dialog box
+    // First argument is title of the window. Third argument is default/initial filename
+    // Fourth argument =0 means the returned filename is absolute path else it will be relative
+    // The second argument is "Filter text(ext_filters)" where ext_filters are used to show the files
+    // in this case, all the bmp, jpeg, jpg and png files will be shown
+    char * file_selected = fl_file_chooser	("Select an Image file","Image files (*.{bmp,jpg,jpeg,png})","", 0);
+    if(file_selected != NULL)   // If the used selected a file
+    {
+        Fl_Image* img = loadImage(file_selected);   // Use our utility to load the image
+        if (!img)   // Image couldn't be loaded
+        {
+            // Display and error message and return
+            fl_message_title("Error");
+            fl_alert("The image could not be loaded!\n"
+                     "Please verify that the selected file is a valid image file!");
+            return;
+        }
+        Fl_Image* tmp_img = img->copy(image_box->w(), image_box->h());      // Create a copy with required width and height
+        delete img;             // Not needed anymore
+        image_box->label("");   // Remove text
+        image_box->image(tmp_img);  // Display the image
+        image_box->redraw();    // Force redraw to update the window
+    }
 }
 
 void quit_cb(Fl_Widget* widget, void* v)
