@@ -14,5 +14,9 @@ In this step, we see how intuitive and functions based model FLTK is. This simpl
 In this step, we create utilities.h and utilities.cpp files and add a function which loads an image from file path. The code is self explanatory with some comments. We also make our image box global and change the image on it in the `open_cb` callback. The code has been explained in comments. We need to redraw the image box after changing the image as, like all GUI APIs, fltk avoids redrawing everything to reduce unnecessary overload. In the next step we will add a list to our program and let the user view all the files from a certain directory rather than just a single image.  
 This step is small, you can use fltk documentation to view all the FLTK classes and functions and how to use them.  
 
-### Step 4
+### Step 4 -- Navigating a list of images and delting images
+In this step we add one more menu item to open a directory. All the images present in the directory will be read by the utility function `populate_image_filenames` which we will create in our utilities header. We will also add callback for all the 4 buttons for previous, next, delete and zoom operations. We also implement the callbacks for the first 3 operations. The first two operations simply involve nagivating forward/backward in the list. For deleting we will use standard C++ function `remove` from stdio. Also, we have changed the code so all available files are stored in a vector of strings. `c_str()` function is used a lot as it returns `char*` for the string which is required for many fltk functions. Also, when user opens one file, we simply clear the list and add that one file to the list.  
+There are many comments to explain the code. If something is not clear, feel free to open and issue on this repo. As mentioned earlier, you can learn more about fltk functions from their docs. Happy Coding! :)  
+
+### Step 5
 Coming Soon...

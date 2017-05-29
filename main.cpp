@@ -6,19 +6,33 @@
 #include <FL/Fl_Menu_Item.H> // Menu items
 #include <FL/Fl_File_Chooser.H> // For open file dialog box
 
-#include <FL/fl_ask.H>
+#include <FL/fl_ask.H>     // For the info and error dialog boxes
 
 #include "utilities.h"  // Our own utility toolkit
+
+#include <vector>
+#include <string>
+using namespace std;
 
 // Function declarations
 void create_all_widgets();
 void create_menu_bar();
-void open_cb(Fl_Widget*, void*);    // Called for open menu
+void update_current_image();
+
+// Callback declarations
+void open_cb(Fl_Widget*, void*);        // Called for open file menu
+void open_dir_cb(Fl_Widget*, void*);    // Called for open directory  menu
 void quit_cb(Fl_Widget*, void*);    // Called for quit menu
 void about_cb(Fl_Widget*, void*);    // Called for about menu
+void prev_cb(Fl_Widget*, void*);    // Called for prev button
+void next_cb(Fl_Widget*, void*);    // Called for next button
+void del_cb(Fl_Widget*, void*);     // Called for delete button
+void zoom_cb(Fl_Widget*, void*);    // Called for zoom button
 
 // Global variable
 Fl_Box *image_box;          // Just a box to display the required images
+vector<string> all_files;   // List of files in opened directory
+int curfile = 0;            // Current photo number in the list that is displayed
 
 int main (int argc, char ** argv)
 {
@@ -44,9 +58,13 @@ void create_all_widgets()
     // Create some buttons, first two numbers are coordinates of the top left
     // corner of the button. The later two numbers are width and height of the button
     Fl_Button* prevButton = new Fl_Button(60, 400, 50, 50, "Prev");
+    prevButton->callback(prev_cb);
     Fl_Button* zoomButton = new Fl_Button(130, 400, 50, 50, "Zoom");
+    zoomButton->callback(zoom_cb);
     Fl_Button* delButton = new Fl_Button(200, 400, 50, 50, "Delete");
+    delButton->callback(del_cb);
     Fl_Button* nextButton = new Fl_Button(270, 400, 50, 50, "Next");
+    nextButton->callback(next_cb);
 }
 
 void create_menu_bar()
@@ -73,6 +91,7 @@ void create_menu_bar()
     {
         { "&File", 0, 0, 0, FL_SUBMENU },
             { "&Open File...",    FL_COMMAND + 'o', (Fl_Callback *)open_cb, 0,  FL_MENU_DIVIDER },
+            { "&Open Directory...",    FL_COMMAND + 'd', (Fl_Callback *)open_dir_cb, 0,  FL_MENU_DIVIDER },
             { "E&xit", FL_COMMAND + 'q', (Fl_Callback *)quit_cb, 0 },
             { 0 },
         { "&Help", 0, 0, 0, FL_SUBMENU },
@@ -87,6 +106,9 @@ void create_menu_bar()
 
 void open_cb(Fl_Widget*, void*)
 {
+    // Undo any directory loading stuff
+    all_files.clear();
+    curfile = 0;
     // Open a new image using the standard file chooser dialog box
     // First argument is title of the window. Third argument is default/initial filename
     // Fourth argument =0 means the returned filename is absolute path else it will be relative
@@ -95,20 +117,30 @@ void open_cb(Fl_Widget*, void*)
     char * file_selected = fl_file_chooser	("Select an Image file","Image files (*.{bmp,jpg,jpeg,png})","", 0);
     if(file_selected != NULL)   // If the used selected a file
     {
-        Fl_Image* img = loadImage(file_selected);   // Use our utility to load the image
-        if (!img)   // Image couldn't be loaded
+        all_files.push_back(string(file_selected)); // Add one file to the list
+        curfile = 0;    // Set current index into the list
+        update_current_image(); // Update the image
+    }
+}
+
+void open_dir_cb(Fl_Widget* widget, void* v)
+{
+    // Open a directory with image files
+    // the 3 arguments are like 1st, 3rd and 4th arguments or fl_file_chooser
+    char* dirname = fl_dir_chooser("Select a directory with image files","", 0);
+    if(dirname != NULL)
+    {
+        populate_image_filenames(dirname, all_files);
+        if(all_files.size() == 0)
         {
-            // Display and error message and return
-            fl_message_title("Error");
-            fl_alert("The image could not be loaded!\n"
-                     "Please verify that the selected file is a valid image file!");
-            return;
+            image_box->image(NULL);  // Remove the image
+            image_box->label("The directory doesn't contain any image files!");   // Remove Info
         }
-        Fl_Image* tmp_img = img->copy(image_box->w(), image_box->h());      // Create a copy with required width and height
-        delete img;             // Not needed anymore
-        image_box->label("");   // Remove text
-        image_box->image(tmp_img);  // Display the image
-        image_box->redraw();    // Force redraw to update the window
+        else
+        {
+            curfile = 0;        // Set the index of current file into the list
+            update_current_image();
+        }
     }
 }
 
@@ -128,4 +160,80 @@ void about_cb(Fl_Widget* widget, void* v)
                "with enough material so that they can google around and learn more on their own.\n"
                "More more such projects check our official account on github:\n"
                "            https://github.com/DaemonLab");     // Display the message
+}
+
+void prev_cb(Fl_Widget* widget, void* v)
+{
+    if (all_files.size()==0 || curfile==0)
+        return;
+    --curfile;
+    update_current_image();
+}
+
+void next_cb(Fl_Widget* widget, void* v)
+{
+    if (all_files.size()==0 || curfile==(all_files.size()-1))
+        return;
+    ++curfile;
+    update_current_image();
+}
+
+void del_cb(Fl_Widget* widget, void* v)
+{
+    if(all_files.size() == 0)
+        return;
+    int choice = fl_choice("Do you really want to delete this file on disk?",
+                           "Yes", "No", 0);         // Text for upto 3 buttons
+    if (choice == 0)    //Yes
+    {
+        // Call the C++ stdio function 'remove' to delete the file on disk
+        if (remove(all_files[curfile].c_str()) != 0)    // Error while deleting
+        {
+            // Show Error dialog
+            fl_message_title("Error");  // Set the title of the box
+            fl_alert("File could not be deleted!\n"
+                       "Please check that you have proper permission for the operation@");
+        }
+        else
+        {
+            // Remove the file from the list
+            all_files.erase(all_files.begin() + curfile);
+            if (curfile >= all_files.size())
+                curfile = all_files.size()-1;
+            // Show info dialog
+            fl_message_title("Info");  // Set the title of the box
+            fl_message("File deleted successfully!");     // Display the message
+            update_current_image();
+        }
+    }
+}
+
+void zoom_cb(Fl_Widget* widget, void* v)
+{
+}
+
+void update_current_image()
+{
+    if(all_files.size()==0)     // No image in the list
+    {
+        image_box->image(NULL);
+        image_box->label("No image to display!");
+        image_box->redraw();    // Force redraw to update the window
+        return;
+    }
+    Fl_Image* img = loadImage(all_files[curfile].c_str());   // Use our utility to load the image
+    if (!img)   // Image couldn't be loaded
+    {
+        // Display and error message and return
+        image_box->image(NULL);
+        image_box->label("The image could not be loaded!\n"
+                         "Please verify that the file is a valid image file!");
+        image_box->redraw();    // Force redraw to update the window
+        return;
+    }
+    Fl_Image* tmp_img = img->copy(image_box->w(), image_box->h());      // Create a copy with required width and height
+    delete img;             // Not needed anymore
+    image_box->label("");   // Remove text
+    image_box->image(tmp_img);  // Display the image
+    image_box->redraw();    // Force redraw to update the window
 }
