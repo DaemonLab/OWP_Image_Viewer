@@ -48,5 +48,28 @@ void populate_image_filenames(char* dirname, vector<string> &v)
             v.push_back(full_path);
         }
     }
+}
 
+Fl_Image* resize_image(Fl_Image* orig, Fl_Widget* widget)
+{
+    // Create a copy with required width and height
+    Fl_Image* tmp_img = orig->copy(widget->w(), widget->h());
+    delete orig;    // Clear memory
+    return tmp_img; // Return new image
+}
+
+Ex_Fl_Window::Ex_Fl_Window(int w, int h) : Fl_Window(w, h)
+{
+}
+
+void Ex_Fl_Window::set_cb(Ex_Redraw_Callback cb)
+{
+    redraw_cb = cb;   // Setting the redraw callback
+}
+
+void Ex_Fl_Window::draw()
+{
+    // Override the draw function to call the redraw update function and then redraw the window
+    redraw_cb();
+    Fl_Window::draw();
 }

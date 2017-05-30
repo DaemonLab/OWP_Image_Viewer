@@ -28,20 +28,24 @@ void prev_cb(Fl_Widget*, void*);    // Called for prev button
 void next_cb(Fl_Widget*, void*);    // Called for next button
 void del_cb(Fl_Widget*, void*);     // Called for delete button
 void zoom_cb(Fl_Widget*, void*);    // Called for zoom button
+void window_cb(Fl_Widget*, void*);    // Called for window resize
 
 // Global variable
 Fl_Box *image_box;          // Just a box to display the required images
 vector<string> all_files;   // List of files in opened directory
 int curfile = 0;            // Current photo number in the list that is displayed
 
+Ex_Fl_Window *window;   // Our extended window which will do resize for us
+
 int main (int argc, char ** argv)
 {
-  Fl_Window *window;        // The outer window with minimize, maximize, close buttons
-  window = new Fl_Window (400, 460);        // Crete a window 400 X 460 (width*height) in pixels size
+  window = new Ex_Fl_Window (400, 460);        // Crete a window 400 X 460 (width*height) in pixels size
 
   create_all_widgets();
   create_menu_bar();
 
+  window->resizable(image_box); // Make the window resizable with image_box being the one which is resized most
+  window->set_cb(update_current_image); // Set the callback when redrawing window
   window->end ();              // Do NOT add any more widgets to this window (even if they are created in code)
   window->show (argc, argv);            // Show the window
 
@@ -52,19 +56,31 @@ void create_all_widgets()
 {
     // Create a box which will be used to display the image. First first two numbers are
     // coordinates of the top left corner of the box. The later two numbers are width and height of the box
-    image_box = new Fl_Box (20, 40, 360, 340, "Image goes here");
-    image_box->box (FL_UP_BOX);     // The box should have a 3D feel that it's UP
+    image_box = new Fl_Box (40, 40, 320, 340, "Image goes here");
 
     // Create some buttons, first two numbers are coordinates of the top left
     // corner of the button. The later two numbers are width and height of the button
-    Fl_Button* prevButton = new Fl_Button(60, 400, 50, 50, "Prev");
+    // Aligning image on a button is necessary because a button tries to save space for text
+    // and we need to tell it that there will not be any text on the button
+    Fl_Button* prevButton = new Fl_Button(0, 160, 40, 100, "");
+    prevButton->image(resize_image(loadImage("images/prev.png"), prevButton));  // Set the image
+    prevButton->align(FL_ALIGN_IMAGE_BACKDROP);     // Align the image on the button
     prevButton->callback(prev_cb);
-    Fl_Button* zoomButton = new Fl_Button(130, 400, 50, 50, "Zoom");
-    zoomButton->callback(zoom_cb);
-    Fl_Button* delButton = new Fl_Button(200, 400, 50, 50, "Delete");
-    delButton->callback(del_cb);
-    Fl_Button* nextButton = new Fl_Button(270, 400, 50, 50, "Next");
+    prevButton->shortcut('a');  // Set the shortcut for this button
+    Fl_Button* nextButton = new Fl_Button(360, 160, 40, 100, "");
+    nextButton->image(resize_image(loadImage("images/next.png"), nextButton));
+    nextButton->align(FL_ALIGN_IMAGE_BACKDROP);
     nextButton->callback(next_cb);
+    nextButton->shortcut('d');
+
+    Fl_Button* zoomButton = new Fl_Button(130, 400, 50, 50, "");
+    zoomButton->image(resize_image(loadImage("images/zoom.png"), zoomButton));
+    zoomButton->align(FL_ALIGN_IMAGE_BACKDROP);
+    zoomButton->callback(zoom_cb);
+    Fl_Button* delButton = new Fl_Button(200, 400, 50, 50, "");
+    delButton->image(resize_image(loadImage("images/delete.png"), delButton));
+    delButton->align(FL_ALIGN_IMAGE_BACKDROP);
+    delButton->callback(del_cb);
 }
 
 void create_menu_bar()
@@ -231,9 +247,7 @@ void update_current_image()
         image_box->redraw();    // Force redraw to update the window
         return;
     }
-    Fl_Image* tmp_img = img->copy(image_box->w(), image_box->h());      // Create a copy with required width and height
-    delete img;             // Not needed anymore
     image_box->label("");   // Remove text
-    image_box->image(tmp_img);  // Display the image
+    image_box->image(resize_image(img, image_box));  // Display the image
     image_box->redraw();    // Force redraw to update the window
 }
