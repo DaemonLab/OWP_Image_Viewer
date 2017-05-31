@@ -28,10 +28,9 @@ void prev_cb(Fl_Widget*, void*);    // Called for prev button
 void next_cb(Fl_Widget*, void*);    // Called for next button
 void del_cb(Fl_Widget*, void*);     // Called for delete button
 void zoom_cb(Fl_Widget*, void*);    // Called for zoom button
-void window_cb(Fl_Widget*, void*);    // Called for window resize
 
 // Global variable
-Fl_Box *image_box;          // Just a box to display the required images
+Ex_Fl_Box *image_box;          // Just a box to display the required images
 vector<string> all_files;   // List of files in opened directory
 int curfile = 0;            // Current photo number in the list that is displayed
 
@@ -46,6 +45,7 @@ int main (int argc, char ** argv)
 
   window->resizable(image_box); // Make the window resizable with image_box being the one which is resized most
   window->set_cb(update_current_image); // Set the callback when redrawing window
+  window->set_imgbox(image_box);
   window->end ();              // Do NOT add any more widgets to this window (even if they are created in code)
   window->show (argc, argv);            // Show the window
 
@@ -56,7 +56,7 @@ void create_all_widgets()
 {
     // Create a box which will be used to display the image. First first two numbers are
     // coordinates of the top left corner of the box. The later two numbers are width and height of the box
-    image_box = new Fl_Box (40, 40, 320, 340, "Image goes here");
+    image_box = new Ex_Fl_Box (40, 40, 320, 340, "Image goes here");
 
     // Create some buttons, first two numbers are coordinates of the top left
     // corner of the button. The later two numbers are width and height of the button
@@ -183,6 +183,7 @@ void prev_cb(Fl_Widget* widget, void* v)
     if (all_files.size()==0 || curfile==0)
         return;
     --curfile;
+    image_box->set_zoomed(false);
     update_current_image();
 }
 
@@ -191,6 +192,7 @@ void next_cb(Fl_Widget* widget, void* v)
     if (all_files.size()==0 || curfile==(all_files.size()-1))
         return;
     ++curfile;
+    image_box->set_zoomed(false);
     update_current_image();
 }
 
@@ -226,6 +228,7 @@ void del_cb(Fl_Widget* widget, void* v)
 
 void zoom_cb(Fl_Widget* widget, void* v)
 {
+    image_box->set_zoomed(!image_box->is_zoomed());
 }
 
 void update_current_image()
@@ -248,6 +251,6 @@ void update_current_image()
         return;
     }
     image_box->label("");   // Remove text
-    image_box->image(resize_image(img, image_box));  // Display the image
-    image_box->redraw();    // Force redraw to update the window
+    image_box->image(img);  // Set the image -- Size will be decided by zoom
+    // This function is already being called in draw function so need to force redraw
 }
