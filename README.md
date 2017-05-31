@@ -4,6 +4,9 @@ Tutorial under our series One Week Projects (OWP) which will focus on projects t
 This is a cross-platform gui tutorial. This is made with FLTK API for C++ in Code::Blocks IDE. The target audience is expected to know something about OOPs. And also should have atleast some idea of what are pointers and how they are handled.  
 FLTK library is very lightweight and portable. By cross-platform we mean that the same code can be compiled on any platform/OS and run without requiring any significant change. There are many cross-platform GUI APIs for C++ out there. But most of them use macros to an extent that things seem to be magical at first. But FLTK. unlike others, is extremely simple in usage and doesn't require any magical macros to be invoked while still being powerful enough to create the most complex GUIs with ease. Another reason for choosing FLTK for this tutorial is that it has inherent support for OpenGL which can come in handy if you are writing an application which needs to deal with 3-D graphics while also providing a good GUI. At the end of the tutorial, hopefully the reader will be able to appeciate the ease of use of FLTK library.  
   
+## Navigating this tutorial
+We understand that many readers might not have familiarity with the `git` framework and hence we have added a guide to explain all the required commands to properly navigate this tutorial. Please have a look at it if you are not familiar with git. The guide is a pdf file named [Navigating_OWP_Image_Viewer.pdf](Navigating_OWP_Image_Viewer.pdf) present with this tutorial.  
+  
   
 ## Running the code
 - Download latest windows binary of Code::Blocks IDE from http://www.codeblocks.org/downloads and select the file that ends with "mingw-setup.exe" as it will contain the MinGW toolchains for windows which will be used for compiling and linking.  
