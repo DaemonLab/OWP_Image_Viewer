@@ -28,6 +28,7 @@ void prev_cb(Fl_Widget*, void*);    // Called for prev button
 void next_cb(Fl_Widget*, void*);    // Called for next button
 void del_cb(Fl_Widget*, void*);     // Called for delete button
 void zoom_cb(Fl_Widget*, void*);    // Called for zoom button
+void controls_cb(Fl_Widget*, void*);    // Called for controls menu
 
 // Global variable
 Ex_Fl_Box *image_box;          // Just a box to display the required images
@@ -112,6 +113,7 @@ void create_menu_bar()
             { 0 },
         { "&Help", 0, 0, 0, FL_SUBMENU },
             { "&About",       FL_COMMAND + 'a', (Fl_Callback *)about_cb },
+            { "&Controls", FL_COMMAND + 'c', (Fl_Callback *)controls_cb },
             { 0 },
         { 0 }
     };
@@ -176,6 +178,15 @@ void about_cb(Fl_Widget* widget, void* v)
                "with enough material so that they can google around and learn more on their own.\n"
                "More more such projects check our official account on github:\n"
                "            https://github.com/DaemonLab");     // Display the message
+}
+
+void controls_cb(Fl_Widget* widget, void* v)
+{
+    // Show Controls info
+    fl_message_title("Controls");  // Set the title of the box
+    fl_message("You can use the following buttons in this app:\n"
+               "   a/d   -- For seeing previous/next image when viewing images in a directory\n"
+               "   i/j/k/l -- For moving a zoomed image around");     // Display the message
 }
 
 void prev_cb(Fl_Widget* widget, void* v)
