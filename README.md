@@ -11,9 +11,12 @@ Very basic decription of each commit will be given in the file [Steps.md](Steps.
   
   
 ## Running the code
-- Download latest windows binary of Code::Blocks IDE from http://www.codeblocks.org/downloads and select the file that ends with "mingw-setup.exe" as it will contain the MinGW toolchains for windows which will be used for compiling and linking.  
-- EITHER download source for FLTK 1.3.4 from its official site (http://www.fltk.org) and build FLTK for you platform using the [Building_FLTK.md](Building_FLTK.md) guide provided here OR download the fltk_1.3.4.rar provided in this repo and extract its contents. If you are on Linux/Mac you will have to build the library yourself, the rar provided here is for windows only.  
-- Clone this repo. And open the ".cbp" file which should open in the IDE.  
+- Download latest windows binary of Code::Blocks IDE from http://www.codeblocks.org/downloads
+- Download MinGW and install it using mingw-get-setup.exe from their official site at https://sourceforge.net/projects/mingw/files/Installer/ We need latest minGW to compile this project.
+- EITHER download source for FLTK 1.3.4 from its official site (http://www.fltk.org) and build FLTK for you platform using the [Building_FLTK.md](Building_FLTK.md) guide provided here OR download the fltk_1.3.4.rar provided in this repo and extract its contents. If you are on Linux/Mac you will have to build the library yourself, the rar provided here is for windows only.
+- Clone this repo. And open the ".cbp" file which should open in the IDE.
+- In CodeBlocks goto Settings->Compiler->Toolchain Executables and select "C:\MinGW" or wherever you installed MinGW in the "Compiler's Installation Directory" field.
+- Press OK to close the window, codeblocks will automatically search for all the compilers in MinGW directory.
 - In CodeBlocks goto Settings->Compiler->Search Directories.
 - Add the "fltk_1.3.4/include" directory in the Compiler Tab.
 - Add the "fltk_1.3.4/lib" directory in the Linker Tab.
