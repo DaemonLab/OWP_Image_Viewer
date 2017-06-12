@@ -41,7 +41,10 @@
 			<Add library="gdi32" />
 			<Add library="user32" />
 			<Add library="kernel32" />
-			<Add directory="D:/Prog_stuff/fltk-1.3.4-1/lib" />
+			<Add library="fltk_images" />
+			<Add library="fltk_png" />
+			<Add library="fltk_jpeg" />
+			<Add library="fltk_z" />
 		</Linker>
 		<Unit filename="main.cpp" />
 		<Unit filename="utilities.cpp" />
